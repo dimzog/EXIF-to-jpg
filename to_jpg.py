@@ -9,7 +9,7 @@ def convert(img_path):
 
     # Backup
     if args.backup:
-        backup_path = Path.cwd() / 'backup'
+        backup_path = img_path.parent / 'backup'
         backup_path.mkdir(parents=True, exist_ok=True)
         img.save(backup_path / img_path.name, quality=100)
 
@@ -22,6 +22,10 @@ def convert(img_path):
 
     img.save(img_save, quality=args.quality)
 
+    # JPGs overwrite themselves, manually delete PNGs
+    if img_path.suffix == '.png':
+        img_path.unlink()
+
 
 if __name__ == '__main__':
 
@@ -32,17 +36,8 @@ if __name__ == '__main__':
     parser.add_argument('--backup', action='store_true', default=True, help='backup original img')
     args = parser.parse_args()
 
-    img_path = Path(args.img_dir)
+    img_dir = Path(args.img_dir)
 
     # Loop over (.jpg/.png)
-    for f in img_path.glob('*.*g'):
-        convert(f)
-
-
-
-
-
-
-
-
-
+    for img_path in img_dir.glob('*.*g'):
+        convert(img_path)
